@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model package="modjochat" baseClass="xPDOObject" platform="mysql" defaultEngine="MyISAM" version="1.1">
+	<object class="Actions" table="actions" extends="xPDOSimpleObject">
+		<field key="channel_id" dbtype="varchar" precision="50" phptype="string" null="true" index="index" />
+		<field key="timestamp" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="false" />
+		<field key="originating_user" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="true" />
+		<field key="destination_user" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="true" />
+		<field key="action_type" dbtype="varchar" precision="50" phptype="string" null="true" />
+		<field key="action_text" dbtype="text" phptype="string" null="true" />
+
+		<index alias="channel_id" name="channel_id" primary="false" unique="false" type="BTREE" >
+			<column key="channel_id" length="" collation="A" null="true" />
+		</index>
+                
+                <aggregate alias="Channels" class="Channels" local="channel_id" foreign="id" cardinality="one" owner="foreign" />
+                
+	</object>
+	<object class="Badwords" table="badwords" extends="xPDOSimpleObject">
+		<field key="search" dbtype="varchar" precision="255" phptype="string" null="false" />
+		<field key="replace" dbtype="varchar" precision="255" phptype="string" null="true" />
+	</object>
+	<object class="Bans" table="bans" extends="xPDOSimpleObject">
+		<field key="user_id" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="true" default="0" />
+		<field key="ip_address" dbtype="varchar" precision="50" phptype="string" null="true" />
+		<field key="user_name" dbtype="varchar" precision="50" phptype="string" null="true" />
+		<field key="email" dbtype="varchar" precision="50" phptype="string" null="true" />
+                
+                <!-- modx's user data -->
+                <aggregate alias="User" class="modUser" local="user_id" foreign="id" cardinality="one" owner="foreign" />
+	</object>
+	<object class="Channels" table="channels" extends="xPDOObject">
+		<field key="id" dbtype="varchar" precision="50" phptype="string" null="false" index="pk" />
+		<field key="description" dbtype="varchar" precision="255" phptype="string" null="true" />
+		<field key="greeting" dbtype="varchar" precision="255" phptype="string" null="true" />
+		<field key="open_time" dbtype="time" phptype="string" null="true" />
+		<field key="open_day" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="true" />
+		<field key="close_time" dbtype="time" phptype="string" null="true" />
+		<field key="close_day" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="true" />
+		<field key="created_by" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="true" />
+		<field key="is_restricted" dbtype="int" precision="1" attributes="unsigned" phptype="integer" null="true" default="0" />
+		<field key="password" dbtype="varchar" precision="255" phptype="string" null="true" />
+		<field key="is_guest_allowed" dbtype="int" precision="1" attributes="unsigned" phptype="integer" null="true" default="1" />
+
+		<index alias="PRIMARY" name="PRIMARY" primary="true" unique="true" type="BTREE" >
+			<column key="id" length="" collation="A" null="false" />
+		</index>
+                
+                <composite alias="OnlineUsers"  class="OnlineUsers" local="id" foreign="channel_id" cardinality="many" owner="local" />
+                <composite alias="Messages"  class="Messages" local="id" foreign="channel_id" cardinality="many" owner="local" />
+                <composite alias="UsersChannelsRoles"  class="UsersChannelsRoles" local="id" foreign="channel_id" cardinality="many" owner="local" />
+                <composite alias="Actions"  class="Actions" local="id" foreign="channel_id" cardinality="many" owner="local" />
+	</object>
+	<object class="Messages" table="messages" extends="xPDOSimpleObject">
+		<field key="channel_id" dbtype="varchar" precision="50" phptype="string" null="false" default="0" index="index" />
+		<field key="user_id" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="false" default="0" index="index" />
+		<field key="user_name" dbtype="varchar" precision="50" phptype="string" null="false" />
+		<field key="ip_address" dbtype="varchar" precision="50" phptype="string" null="false" />
+		<field key="timestamp" dbtype="int" precision="10" phptype="integer" null="false" />
+		<field key="text" dbtype="text" phptype="string" null="true" />
+
+		<index alias="user_id" name="user_id" primary="false" unique="false" type="BTREE" >
+			<column key="user_id" length="" collation="A" null="false" />
+		</index>
+		<index alias="channel_id" name="channel_id" primary="false" unique="false" type="BTREE" >
+			<column key="channel_id" length="" collation="A" null="false" />
+		</index>
+                
+                <aggregate alias="Channels" class="Channels" local="channel_id" foreign="id" cardinality="one" owner="foreign" />
+
+	</object>
+	<object class="OnlineUsers" table="online_users" extends="xPDOObject">
+		<field key="user_id" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="false" index="pk" />
+		<field key="ip_address" dbtype="varchar" precision="50" phptype="string" null="false" index="pk" />
+		<field key="user_name" dbtype="varchar" precision="50" phptype="string" null="false" index="pk" />
+		<field key="channel_id" dbtype="varchar" precision="50" phptype="string" null="false" index="pk" />
+		<field key="timeout" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="false" />
+
+		<index alias="PRIMARY" name="PRIMARY" primary="true" unique="true" type="BTREE" >
+			<column key="user_id" length="" collation="A" null="false" />
+			<column key="ip_address" length="" collation="A" null="false" />
+			<column key="user_name" length="" collation="A" null="false" />
+			<column key="channel_id" length="" collation="A" null="false" />
+		</index>
+                
+                <aggregate alias="Channels" class="Channels" local="channel_id" foreign="id" cardinality="one" owner="foreign" />
+	</object>
+	<object class="Roles" table="roles" extends="xPDOSimpleObject">
+		<field key="role" dbtype="varchar" precision="255" phptype="string" null="false" />
+
+                <composite alias="RolesPermissions"  class="RolesPermissions" local="id" foreign="role_id" cardinality="many" owner="local" />
+                <composite alias="UsersChannelsRoles"  class="UsersChannelsRoles" local="id" foreign="role_id" cardinality="many" owner="local" />
+	</object>
+	<object class="RolesPermissions" table="roles_permissions" extends="xPDOObject">
+		<field key="role_id" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="false" index="pk" />
+		<field key="key" dbtype="varchar" precision="255" phptype="string" null="false" index="pk" />
+		<field key="value" dbtype="varchar" precision="255" phptype="string" null="true" />
+
+		<index alias="PRIMARY" name="PRIMARY" primary="true" unique="true" type="BTREE" >
+			<column key="role_id" length="" collation="A" null="false" />
+			<column key="key" length="" collation="A" null="false" />
+		</index>
+
+                <aggregate alias="Roles" class="Roles" local="role_id" foreign="id" cardinality="one" owner="foreign" />
+	</object>
+	<object class="Settings" table="settings" extends="xPDOObject">
+		<field key="key" dbtype="varchar" precision="50" phptype="string" null="false" index="pk" />
+		<field key="value" dbtype="varchar" precision="255" phptype="string" null="true" />
+
+		<index alias="PRIMARY" name="PRIMARY" primary="true" unique="true" type="BTREE" >
+			<column key="key" length="" collation="A" null="false" />
+		</index>
+	</object>
+	<object class="UsersChannelsRoles" table="users_channels_roles" extends="xPDOObject">
+		<field key="user_id" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="false" index="pk" />
+		<field key="channel_id" dbtype="varchar" precision="50" phptype="string" null="false" index="pk" />
+		<field key="role_id" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="false" index="pk" />
+
+		<index alias="PRIMARY" name="PRIMARY" primary="true" unique="true" type="BTREE" >
+			<column key="user_id" length="" collation="A" null="false" />
+			<column key="channel_id" length="" collation="A" null="false" />
+			<column key="role_id" length="" collation="A" null="false" />
+		</index>
+                
+                <!-- modx's user data -->
+                <aggregate alias="User" class="modUser" local="user_id" foreign="id" cardinality="one" owner="foreign" />
+                <aggregate alias="Channel" class="Channels" local="channel_id" foreign="id" cardinality="one" owner="foreign" />
+                <aggregate alias="Role" class="Roles" local="role_id" foreign="id" cardinality="one" owner="foreign" />
+	</object>
+</model>

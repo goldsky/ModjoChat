@@ -1,0 +1,40 @@
+body {
+    overflow-y: scroll;
+}
+
+#modjochat-wrapper {
+}
+
+.modjochatChatBox {
+    height: 100%;
+    min-height: 500px;
+    max-height: 700px;
+}
+
+.modjochatFootNote,
+.modjochatFootNote a {
+    text-align: right;
+    font-size: small;
+    color: #bbb;
+}
+
+.modjochatInputInner {
+    color: #ddd;
+}
+
+.modjochatChatInfo {
+    font-size: 0.9em;
+    border-bottom: 1px dotted #ccc;
+    padding: 5px;
+}
+.modjochatChatUser {
+    margin-right: 5px;
+    color: blue;
+}
+.modjochatChatTime {
+    color: #bbb;
+    font-style: italic;
+}
+.modjochatChatText {
+    margin-left: 50px;
+}
